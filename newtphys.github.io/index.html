@@ -1,754 +1,178 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="description"
         content="NewtPhys is a 4D physically annotated dataset and benchmark for evaluating whether foundation models understand low-level Newtonian physics.">
   <meta name="keywords" content="NewtPhys, Newtonian Physics, VLM, VFM, Dataset, Benchmark">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NewtPhys: Do Foundation Models Understand Newtonian Physics?</title>
+  <title>NewtPhys: Coming Soon</title>
 
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
         rel="stylesheet">
-
-  <link rel="stylesheet" href="./static/css/bulma.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
-  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
-  <link rel="stylesheet" href="./static/css/index.css">
   <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍎</text></svg>'>
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script defer src="./static/js/fontawesome.all.min.js"></script>
-  <script src="./static/js/bulma-carousel.min.js"></script>
-  <script src="./static/js/bulma-slider.min.js"></script>
-  <script src="./static/js/index.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #16202a;
+      --muted: #5f6d7a;
+      --line: #d9e2ea;
+      --paper: #f8fafc;
+      --accent: #b3262e;
+      --accent-dark: #7c1f26;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      font-family: "Google Sans", "Noto Sans", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% 18%, rgba(179, 38, 46, 0.12), transparent 28rem),
+        linear-gradient(135deg, #ffffff 0%, var(--paper) 48%, #eef4f7 100%);
+    }
+
+    main {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 2rem;
+    }
+
+    .coming-soon {
+      width: min(1120px, 100%);
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+      gap: clamp(1.5rem, 4vw, 4rem);
+      align-items: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 1rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-dark);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 780px;
+      font-size: clamp(2.35rem, 5vw, 5rem);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 1.25rem 0 0;
+      max-width: 650px;
+      font-size: clamp(1.1rem, 2vw, 1.45rem);
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .notice {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 2rem;
+      padding: 0.85rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 18px 45px rgba(22, 32, 42, 0.08);
+      font-weight: 700;
+    }
+
+    .notice-mark {
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 0.35rem rgba(179, 38, 46, 0.12);
+      flex: 0 0 auto;
+    }
+
+    .preview {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(22, 32, 42, 0.12);
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 28px 80px rgba(22, 32, 42, 0.16);
+    }
+
+    .preview img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1.23;
+      object-fit: cover;
+    }
+
+    .preview::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 55%, rgba(22, 32, 42, 0.72));
+      pointer-events: none;
+    }
+
+    .preview-caption {
+      position: absolute;
+      left: 1rem;
+      right: 1rem;
+      bottom: 1rem;
+      z-index: 1;
+      margin: 0;
+      color: #ffffff;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 840px) {
+      main {
+        place-items: start center;
+      }
+
+      .coming-soon {
+        grid-template-columns: 1fr;
+      }
+
+      .preview {
+        order: -1;
+      }
+    }
+  </style>
 </head>
 <body>
-
-<nav class="navbar" role="navigation" aria-label="main navigation">
-  <div class="navbar-brand">
-    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-    </a>
-  </div>
-  <div class="navbar-menu">
-    <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
-      <a class="navbar-item" href="#abstract">Abstract</a>
-      <a class="navbar-item" href="#dataset">Dataset</a>
-      <a class="navbar-item" href="#benchmark">Benchmark</a>
-      <a class="navbar-item" href="./data_viewer/">Dataset Viewer</a>
-      <a class="navbar-item" href="#results">Results</a>
-      <a class="navbar-item" href="#BibTeX">BibTeX</a>
-    </div>
-  </div>
-</nav>
-
-
-<section class="hero">
-  <div class="hero-body">
-    <div class="container is-max-desktop">
-      <div class="columns is-centered">
-        <div class="column has-text-centered">
-          <h1 class="title is-1 publication-title">NewtPhys: Do Foundation Models Understand Newtonian Physics?</h1>
-          <div class="is-size-5 publication-authors">
-            <span class="author-block">
-              <a href="https://sebo-the-tramp.github.io/">Sebastian Cavada</a><sup>3,*</sup>,</span>
-            <span class="author-block">
-              <a href="https://mvp18.github.io/">Soumava Paul</a><sup>1</sup>,</span>
-            <span class="author-block">
-              <a href="https://tuanhungvu.github.io/">Tuan-Hung Vu</a><sup>1,2</sup>,</span>
-            <span class="author-block">
-              <a href="https://abursuc.github.io/">Andrei Bursuc</a><sup>1,2</sup>,</span>
-            <span class="author-block">
-              <a href="https://rdecharette.github.io/">Raoul de Charette</a><sup>1,*</sup>
-            </span>
-          </div>
-
-          <div class="is-size-5 publication-authors">
-            <span class="author-block"><sup>1</sup><a href="https://www.inria.fr/en">Inria</a>,</span>
-            <span class="author-block"><sup>2</sup><a href="https://valeo.ai/">Valeo.ai</a>,</span>
-            <span class="author-block"><sup>3</sup><a href="https://mbzuai.ac.ae/">MBZUAI</a></span>
-          </div>
-
-          <div class="is-size-6 publication-authors">
-            <span class="author-block"><sup>*</sup>These authors contributed equally</span>
-          </div>
-
-          <div class="column has-text-centered">
-            <div class="publication-links">
-              <span class="link-block">
-                <a href="https://example.com/paper"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="ai ai-arxiv"></i>
-                  </span>
-                  <span>Paper</span>
-                </a>
-              </span>
-              <span class="link-block">
-                <a href="https://example.com/dataset"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <span aria-hidden="true">🤗</span>
-                  </span>
-                  <span>Dataset</span>
-                </a>
-              </span>
-              <span class="link-block">
-                <a href="./data_viewer/"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fas fa-table"></i>
-                  </span>
-                  <span>Dataset Viewer</span>
-                </a>
-              </span>
-              <span class="link-block">
-                <a href="#results"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fas fa-chart-line"></i>
-                  </span>
-                  <span>Results</span>
-                </a>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="hero teaser">
-  <div class="container is-max-desktop">
-    <div class="hero-body">
-      <div class="columns is-vcentered">
-        <div class="column is-three-quarters">
-          <div style="position: relative;">
-            <figure class="image">
-              <img src="./static/images/newtphys/collage_sl1_sa7_f1_teaser.png"
-                   alt="NewtPhys teaser collage showing physically annotated real-world scenes.">
-            </figure>
-            <img src="./static/images/newtphys/legend.png"
-                 alt="Legend for the teaser overlays."
-                 style="position: absolute; width: 15%; left: 54%; bottom: 1.5%; transform: translateX(-50%);">
-          </div>
-        </div>
-        <div class="column">
-          <figure class="image" style="margin-bottom: 0.75rem;">
-            <img src="./static/images/newtphys/commonsense_model.png"
-                 alt="Common-sense benchmark comparison from the NewtPhys teaser.">
-          </figure>
-          <figure class="image">
-            <img src="./static/images/newtphys/highlight_model.png"
-                 alt="Highlighted NewtPhys model comparison from the teaser.">
-          </figure>
-        </div>
-      </div>
-      <h2 class="subtitle has-text-centered">
-        <strong>NewtPhys</strong> studies low-level physics understanding in vision-language models (VLMs) and vision foundation models (VFMs), revealing gaps in Newtonian reasoning. We introduce a physically annotated dataset spanning diverse scenes, objects (<em>rigid and soft</em>) and dynamic interactions captured from static or moving cameras. It provides 2D and 3D annotations in metric units, including materials, kinematics, dynamics, camera parameters, and collision events. <strong>Left:</strong> exemplar scenes with selected overlays such as real-world velocity, visibility, collisions, and forces. <strong>Right:</strong> large-scale benchmarking of 54 VLMs showing that despite reasonable performance on commonsense tasks, current models still struggle to capture Newtonian physics.
-      </h2>
-    </div>
-  </div>
-</section>
-
-
-<section class="section map-overlay-section">
-  <div class="container is-max-desktop">
-    <div class="map-overlay-card">
-      <div class="content has-text-centered">
-        <h2 class="title is-4">Rendered Videos + Physics Map Overlay</h2>
-        <p class="map-overlay-intro">
-          Select a precomputed map visualization.
+  <main>
+    <section class="coming-soon" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">Sneak peek</p>
+        <h1 id="page-title">NewtPhys is almost ready.</h1>
+        <p class="subtitle">
+          A 4D physically annotated dataset and benchmark for probing whether foundation models understand Newtonian physics.
+        </p>
+        <p class="notice">
+          <span class="notice-mark" aria-hidden="true"></span>
+          Full page coming soon. Stay tuned.
         </p>
       </div>
 
-      <div class="map-player-shell" data-map-player>
-        <div class="map-player-controls" role="toolbar" aria-label="Physics map overlay controls">
-          <button class="map-toggle-button is-active"
-                  type="button"
-                  data-video-file="_fps-25_render.mp4"
-                  aria-pressed="true">
-            RGB only
-          </button>
-          <button class="map-toggle-button"
-                  type="button"
-                  data-video-file="_fps-25_materials.mp4"
-                  aria-pressed="false">
-            Materials
-          </button>
-          <button class="map-toggle-button"
-                  type="button"
-                  data-video-file="_fps-25_sceneflow.mp4"
-                  aria-pressed="false">
-            Scene flow
-          </button>
-          <button class="map-toggle-button"
-                  type="button"
-                  data-video-file="_fps-25_force_collision.mp4"
-                  aria-pressed="false">
-            Collision force
-          </button>
-          <button class="map-toggle-button"
-                  type="button"
-                  data-video-file="_fps-25_instances.mp4"
-                  aria-pressed="false">
-            Instances
-          </button>
-        </div>
-
-        <div class="map-player-stage">
-          <video id="newtphys-map-video"
-                 class="map-base-video"
-                 autoplay
-                 controls
-                 muted
-                 loop
-                 playsinline
-                 preload="auto"
-                 data-scene-path="./video_newtphys_maps/bench"
-                 data-video-file="_fps-25_render.mp4">
-            <source src="./video_newtphys_maps/bench/_fps-25_render.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-
-        <div class="map-scene-switcher" role="toolbar" aria-label="Scene selector">
-          <span class="map-scene-label">Scene</span>
-          <button class="map-scene-button is-active"
-                  type="button"
-                  data-scene-path="./video_newtphys_maps/bench"
-                  aria-pressed="true">
-            bench
-          </button>
-          <button class="map-scene-button"
-                  type="button"
-                  data-scene-path="./video_newtphys_maps/horse_statue"
-                  aria-pressed="false">
-            horse statue
-          </button>
-          <button class="map-scene-button"
-                  type="button"
-                  data-scene-path="./video_newtphys_maps/park"
-                  aria-pressed="false">
-            park
-          </button>
-          <button class="map-scene-button"
-                  type="button"
-                  data-scene-path="./video_newtphys_maps/ping_pong"
-                  aria-pressed="false">
-            ping pong
-          </button>
-          <button class="map-scene-button"
-                  type="button"
-                  data-scene-path="./video_newtphys_maps/pink_tree"
-                  aria-pressed="false">
-            pink tree
-          </button>
-          <button class="map-scene-button"
-                  type="button"
-                  data-scene-path="./video_newtphys_maps/shop"
-                  aria-pressed="false">
-            shop
-          </button>
-          <button class="map-scene-button"
-                  type="button"
-                  data-scene-path="./video_newtphys_maps/tree"
-                  aria-pressed="false">
-            tree
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<section class="hero is-light is-small">
-  <div class="hero-body">
-    <div class="container">
-       <div class="content has-text-centered">
-        <h2 class="title is-4">More Rendered Videos</h2> 
-      </div>
-      <div id="results-carousel" class="carousel results-carousel">
-        <div class="item item-sim-overview">
-          <video autoplay controls muted loop playsinline height="100%">
-            <source src="./sims/_fps-25_render.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-sim-one">
-          <video autoplay controls muted loop playsinline height="100%">
-            <source src="./sims/c-1_no-1_d-10_s-dl3dv-all_models-hf-gso_MLP-10_smooth_h-10-40_seed-12_20251213_211001.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-sim-five">
-          <video autoplay controls muted loop playsinline height="100%">
-            <source src="./sims/c-1_no-5_d-10_s-dl3dv-all_models-hf-gso_MLP-10_smooth_h-10-40_seed-0_20251214_082135.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-sim-ten">
-          <video autoplay controls muted loop playsinline height="100%">
-            <source src="./sims/c-1_no-10_d-10_s-dl3dv-all_models-hf-gso_MLP-10_smooth_h-10-40_seed-109_20251217_011044.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-sim-one-b">
-          <video autoplay controls muted loop playsinline height="100%">
-            <source src="./sims/c-1_no-1_d-10_s-dl3dv-all_models-hf-gso_MLP-10_smooth_h-10-40_seed-46_20251213_221154.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-sim-three">
-          <video autoplay controls muted loop playsinline height="100%">
-            <source src="./sims/c-1_no-3_d-10_s-dl3dv-all_models-hf-gso_MLP-10_smooth_h-10-40_seed-103_20251212_055810.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-sim-four">
-          <video autoplay controls muted loop playsinline height="100%">
-            <source src="./sims/c-1_no-4_d-10_s-dl3dv-all_models-hf-gso_MLP-10_smooth_h-10-40_seed-104_20251212_112254.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-sim-five-b">
-          <video autoplay controls muted loop playsinline height="100%">
-            <source src="./sims/c-1_no-5_d-10_s-dl3dv-all_models-hf-gso_MLP-10_smooth_h-10-40_seed-42_20251214_130817.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-sim-six">
-          <video autoplay controls muted loop playsinline height="100%">
-            <source src="./sims/c-1_no-6_d-10_s-dl3dv-all_models-hf-gso_MLP-10_smooth_h-10-40_seed-13_20251214_155719.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-sim-ten-b">
-          <video autoplay controls muted loop playsinline height="100%">
-            <source src="./sims/c-1_no-10_d-10_s-dl3dv-all_models-hf-gso_MLP-10_smooth_h-10-40_seed-121_20251217_020415.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-      </div> 
-    </div>
-  </div>
-</section>
-
-
-<section class="section" id="abstract">
-  <div class="container is-max-desktop">
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
-        <h2 class="title is-3">Abstract</h2>
-        <div class="content has-text-justified">
-          <p>
-            Previous work has evaluated physics reasoning in foundation models using synthetic or semi-synthetic scenes and visual question-answering tasks. However, these benchmarks emphasize high-level events and lack the visual fidelity required to assess true low-level Newtonian understanding. We introduce <strong>NewtPhys</strong>, a 4D physically annotated dataset built from multiview images of real-world scenes with physics-grounded simulations. The dataset provides dense, fine-grained annotations across timesteps, including 3D forces and per-pixel physical quantities, bridging the gap between simplistic synthetic setups and realistic visual complexity. Using NewtPhys, we systematically evaluate 54 VLMs and 10 VFMs and reveal limitations in low-level physics reasoning. Beyond benchmarking, our dataset enables future research in physics-grounded vision and the development of next-generation physics-aware evaluations.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<section class="section" id="dataset">
-  <div class="container is-max-desktop">
-    <div class="columns is-centered">
-      <div class="column is-full-width">
-        <h2 class="title is-3">Dataset</h2>
-        <div class="content has-text-justified">
-          <p>
-            NewtPhys combines real-world DL3DV scenes with Google Scanned Objects, both represented as 3D Gaussian Splats, and simulates their interactions with a customized Newtonian solver derived from Simplicits. This makes it possible to script realistic scenes with rigid and deformable objects while recording collisions, inertia, gravity, deformation, and material stress over time.
-          </p>
-          <p>
-            The dataset uses 53 scenes and 109 objects, with 333 object trainings across physical-property variations. It contains 11K sequences rendered at 25 FPS, totaling 730K frames, and provides six dense per-pixel annotations: collisions, gravity force, material segmentation, instances, scene flow, and deformation gradient.
-          </p>
-        </div>
-        <figure class="image">
-          <img src="./static/images/newtphys/pipeline_v3.png"
-               alt="NewtPhys dataset construction pipeline.">
-        </figure>
-        <p class="has-text-centered">
-          Dataset construction from multiview scenes and scanned objects to rendered sequences, pixel-aligned physical maps, VQA generation, and physics probing.
-        </p>
-
-        <h3 class="title is-4">Supplementary Statistics</h3>
-        <div class="columns is-vcentered">
-          <div class="column is-three-quarters">
-            <p class="has-text-centered is-size-7"><strong>Sequence characteristics</strong></p>
-            <div class="columns is-mobile">
-              <div class="column">
-                <figure class="image">
-                  <img src="./static/images/newtphys/stats_duration.png"
-                       alt="Sequence duration statistics.">
-                </figure>
-              </div>
-              <div class="column">
-                <figure class="image">
-                  <img src="./static/images/newtphys/stats_collisions_events.png"
-                       alt="Collision statistics.">
-                </figure>
-              </div>
-              <div class="column">
-                <figure class="image">
-                  <img src="./static/images/newtphys/stats_infov_objects.png"
-                       alt="Visible objects statistics.">
-                </figure>
-              </div>
-            </div>
-
-            <p class="has-text-centered is-size-7"><strong>Object physical properties</strong></p>
-            <div class="columns is-mobile">
-              <div class="column">
-                <figure class="image">
-                  <img src="./static/images/newtphys/stats_yms.png"
-                       alt="Young's modulus statistics.">
-                </figure>
-              </div>
-              <div class="column">
-                <figure class="image">
-                  <img src="./static/images/newtphys/stats_volume.png"
-                       alt="Object volume statistics.">
-                </figure>
-              </div>
-              <div class="column">
-                <figure class="image">
-                  <img src="./static/images/newtphys/stats_mass.png"
-                       alt="Object mass statistics.">
-                </figure>
-              </div>
-            </div>
-
-            <p class="has-text-centered is-size-7"><strong>Motion and visibility</strong></p>
-            <div class="columns is-mobile">
-              <div class="column">
-                <figure class="image">
-                  <img src="./static/images/newtphys/stats_motion.png"
-                       alt="Object motion statistics.">
-                </figure>
-              </div>
-              <div class="column">
-                <figure class="image">
-                  <img src="./static/images/newtphys/stats_cam_motion.png"
-                       alt="Camera motion statistics.">
-                </figure>
-              </div>
-              <div class="column">
-                <figure class="image">
-                  <img src="./static/images/newtphys/stats_fov_visibility_new.png"
-                       alt="Field-of-view visibility statistics.">
-                </figure>
-              </div>
-            </div>
-          </div>
-          <div class="column">
-            <p class="has-text-centered is-size-7"><strong>Dataset distributions</strong></p>
-            <figure class="image" style="margin-bottom: 1rem;">
-              <img src="./static/images/newtphys/stats_category_pie.png"
-                   alt="Question category distribution.">
-            </figure>
-            <figure class="image">
-              <img src="./static/images/newtphys/stats_material_pie.png"
-                   alt="Material distribution pie chart.">
-            </figure>
-          </div>
-        </div>
-        <p class="has-text-centered">
-          Additional statistics from the supplementary material highlighting sequence duration, collisions, visible object counts, physical properties, motion, visibility, and benchmark distributions.
-        </p>
-
-        <div id="dataset-sunburst-anchor"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<section class="section" id="benchmark">
-  <div class="container is-max-desktop">
-    <div class="columns is-centered">
-      <div class="column is-full-width">
-        <h2 class="title is-3">Benchmark</h2>
-        <div class="content has-text-justified">
-          <p>
-            The NewtPhys benchmark evaluates low-level Newtonian understanding through automatically generated visual question answering and pixel-level physics probing. VQA spans six axes of study: material understanding, mechanics, spatial reasoning, viewpoint, temporal reasoning, and permanence.
-          </p>
-          <p>
-            In total, the benchmark contains 141K VQA pairs, including 84K multi-frame and 57K single-frame samples. The study benchmarks 54 vision-language models and extends to 10 vision foundation models through frozen-encoder physics probing on pixel-aligned physical maps.
-          </p>
-        </div>
-
-        <div class="has-text-centered" style="margin-bottom: 1.5rem;">
-          <a href="./data_viewer/"
-             class="external-link button is-normal is-rounded is-dark">
-            <span class="icon">
-                <i class="fas fa-search"></i>
-            </span>
-            <span>Press Here To Browse The Full VQA Dataset</span>
-          </a>
-        </div>
-
-        <h3 class="title is-4">Qualitative Samples</h3>
-        <div class="columns is-mobile is-multiline">
-          <div class="column is-one-third">
-            <figure class="image">
-              <img src="./static/images/newtphys/outside_plushy.png"
-                   alt="Five objects colliding crop from the NewtPhys qualitative figure.">
-            </figure>
-            <p class="has-text-centered is-size-7">
-              5 objects colliding (crop)
-            </p>
-          </div>
-          <div class="column is-one-third">
-            <figure class="image">
-              <img src="./static/images/newtphys/outside_plushy_01.png"
-                   alt="Four soft objects from the NewtPhys qualitative figure.">
-            </figure>
-            <p class="has-text-centered is-size-7">
-              4 soft objects
-            </p>
-          </div>
-          <div class="column is-one-third">
-            <figure class="image">
-              <img src="./static/images/newtphys/pencil_outside.png"
-                   alt="Flexible pencil cases crop from the NewtPhys qualitative figure.">
-            </figure>
-            <p class="has-text-centered is-size-7">
-              Flexible pencil cases (crop)
-            </p>
-          </div>
-          <div class="column is-one-third">
-            <figure class="image">
-              <img src="./static/images/newtphys/000015.png"
-                   alt="Five objects interacting from the NewtPhys qualitative figure.">
-            </figure>
-            <p class="has-text-centered is-size-7">
-              5 objects interacting
-            </p>
-          </div>
-          <div class="column is-one-third">
-            <figure class="image">
-              <img src="./static/images/newtphys/inside_top.png"
-                   alt="Ten objects in free fall from the NewtPhys qualitative figure.">
-            </figure>
-            <p class="has-text-centered is-size-7">
-              10 objects in free fall
-            </p>
-          </div>
-          <div class="column is-one-third">
-            <figure class="image">
-              <img src="./static/images/newtphys/inside_plushy_00.png"
-                   alt="Multi-way interactions from the NewtPhys qualitative figure.">
-            </figure>
-            <p class="has-text-centered is-size-7">
-              Multi-way interactions
-            </p>
-          </div>
-        </div>
-        <p class="has-text-centered is-size-7">
-          <strong>NewtPhys (ours)</strong>
-        </p>
-
-        <h3 class="title is-4">Interactive VQA Viewer</h3>
-        <div class="content has-text-justified"> 
-        </div>
-        <div style="width: 100%; overflow: hidden; display: flex; justify-content: center;">
-          <iframe
-            id="interactive-vqa-frame"
-            src="./nerfies.html"
-            title="Interactive NewtPhys VQA viewer"
-            loading="lazy"
-            scrolling="no"
-            width="100%"
-            height="400"
-            style="border: 0px; display: block; width: 100%; max-width: 100%; margin: 0px auto; height: 400px;">
-          </iframe>
-        </div>
-        <div class="has-text-centered" id="vqa-portal-note" style="margin-top: 1rem;">
-          <!-- <p class="is-size-7">
-            Placeholder for the dedicated interactive VQA website. Once that external URL exists, replace the current placeholder targets with that link.
-          </p> -->
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<section class="section" id="results">
-  <div class="container is-max-desktop">
-    <div class="columns is-centered">
-      <div class="column is-full-width">
-        <h2 class="title is-3">Results</h2>
-        <div class="content has-text-justified">
-          <p>
-            Across 54 VLMs, NewtPhys reveals a large gap between broad multimodal competence and low-level physical understanding. Models remain weak on mechanics and material-property estimation, and even strong families improve only modestly on the hardest Newtonian categories.
-          </p>
-          <p>
-            The paper further shows that performance on common multimodal benchmarks is only weakly aligned with low-level physics accuracy, which suggests that current notions of common sense do not adequately measure Newtonian understanding.
-          </p>
-        </div>
-
-        <h3 class="title is-4">VLM Benchmarking</h3>
-        <div class="content has-text-justified">
-          <p>
-            The first result block follows the main paper analysis of how VLMs perform on fundamental physics. With the exception of the strongest families, most models operate in a low-accuracy regime on NewtPhys, and the gap is most visible once reasoning requires force, collision, or material-property estimation rather than broad spatial plausibility.
-          </p>
-        </div>
-        <div class="columns is-vcentered">
-          <div class="column is-two-thirds">
-            <figure class="image">
-              <img src="./static/images/newtphys/acc_category_family_biggest.png"
-                   alt="Overall VQA performance across model families.">
-            </figure>
-            <p class="has-text-centered is-size-7">
-              Overall VQA performance of the largest model per family.
-            </p>
-          </div>
-          <div class="column">
-            <figure class="image">
-              <img src="./static/images/newtphys/acc_category_per_rank.png"
-                   alt="Category performance by model rank.">
-            </figure>
-            <p class="has-text-centered is-size-7">
-              Category accuracy across model-rank groups.
-            </p>
-          </div>
-        </div>
-
-        <h3 class="title is-4">Physics Categories</h3>
-        <div class="content has-text-justified">
-          <p>
-            The paper shows that material identification is noticeably easier than estimating density, Young's modulus, or Poisson ratio, which require finer physical interpretation. Softer objects also tend to be easier for models because deformation offers stronger visual cues, while increasing scene complexity does not uniformly hurt every category.
-          </p>
-        </div>
-        <div class="columns is-vcentered">
-          <div class="column is-three-fifths">
-            <figure class="image">
-              <img src="./static/images/newtphys/acc_physics_sub_category_model.png"
-                   alt="Physics sub-category performance across models.">
-            </figure>
-            <p class="has-text-centered is-size-7">
-              Physics-specific breakdown across density, mass, material identification, Poisson ratio, Young's modulus, collision, and kinematics.
-            </p>
-          </div>
-          <div class="column">
-            <figure class="image" style="margin-bottom: 1rem;">
-              <img src="./static/images/newtphys/yms_material_understanding.png"
-                   alt="Material understanding under Young's modulus variations.">
-            </figure>
-            <figure class="image">
-              <img src="./static/images/newtphys/numobj_curve_category_model_best10.png"
-                   alt="Performance trends with increasing number of objects.">
-            </figure>
-            <p class="has-text-centered is-size-7">
-              Variation analyses for object softness and scene complexity.
-            </p>
-          </div>
-        </div>
-
-        <h3 class="title is-4">Common-Sense Correlation</h3>
-        <div class="content has-text-justified">
-          <p>
-            The correlation analysis mirrors the discussion section of the paper: standard multimodal common-sense benchmarks correlate with NewtPhys only partially, and especially weakly for the low-level physics categories. This is one of the central claims of the work, namely that current benchmark ecosystems do not adequately measure Newtonian understanding.
-          </p>
-        </div>
-        <div class="columns is-vcentered">
-          <div class="column">
-            <figure class="image">
-              <img src="./static/images/newtphys/cs_correlation.png"
-                   alt="Average common-sense correlation with NewtPhys performance.">
-            </figure>
-            <p class="has-text-centered is-size-7">
-              Average common-sense correlation still underestimates low-level physics gaps.
-            </p>
-          </div>
-          <div class="column">
-            <figure class="image">
-              <img src="./static/images/newtphys/benchmarks_violin.png"
-                   alt="Correlation per external benchmark.">
-            </figure>
-            <p class="has-text-centered is-size-7">
-              Per-benchmark correlations stay weak for low-level physics reasoning.
-            </p>
-          </div>
-        </div>
-
-        <h3 class="title is-4">VFM Physics Probing</h3>
-        <div class="content has-text-justified">
-          <p>
-            The paper also evaluates 10 vision foundation models through physics probing. Frozen visual encoders are paired with lightweight decoders to predict collision, gravity, Gravity-OOD, and scene flow signals from NewtPhys. Self-supervised models generally perform best, MiDaS is the strongest fully supervised baseline, and DINO stands out on gravity prediction, but overall performance is still far from a robust physics-grounded representation.
-          </p>
-        </div>
-        <div class="table-container">
-          <table class="table is-fullwidth is-striped is-hoverable is-size-7">
-            <thead>
-              <tr>
-                <th>Family</th>
-                <th>Supervision</th>
-                <th>Model</th>
-                <th>Objective</th>
-                <th>Collision F1</th>
-                <th>Gravity mAE</th>
-                <th>Gravity magE</th>
-                <th>Gravity-OOD mAE</th>
-                <th>Gravity-OOD magE</th>
-                <th>Scene Flow AEE</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>Vision</td><td>Fully-supervised</td><td>DeiT III</td><td>Classification</td><td>48.47</td><td>19.34</td><td>21.44</td><td>15.20</td><td>35.43</td><td>1.29</td></tr>
-              <tr><td>Vision</td><td>Fully-supervised</td><td>SAM</td><td>Segmentation</td><td>54.80</td><td>20.73</td><td>17.04</td><td>16.28</td><td>33.98</td><td>0.94</td></tr>
-              <tr><td>Vision</td><td>Fully-supervised</td><td>MiDaS</td><td>Depth</td><td>54.95</td><td>12.12</td><td>15.06</td><td>8.23</td><td>33.80</td><td>0.95</td></tr>
-              <tr><td>Vision</td><td>Self-supervised</td><td>MAE</td><td>SSL</td><td>28.61</td><td>45.69</td><td>31.79</td><td>42.91</td><td>42.50</td><td>1.29</td></tr>
-              <tr><td>Vision</td><td>Self-supervised</td><td>DINO</td><td>SSL</td><td>56.54</td><td>13.79</td><td>14.92</td><td>9.30</td><td>33.33</td><td>0.94</td></tr>
-              <tr><td>Vision</td><td>Self-supervised</td><td>DINOv2</td><td>SSL</td><td>56.52</td><td>14.95</td><td>14.76</td><td>11.02</td><td>33.81</td><td>0.95</td></tr>
-              <tr><td>Vision</td><td>Agglomerative</td><td>AM-Radio</td><td>Distillation</td><td>56.96</td><td>13.90</td><td>13.95</td><td>8.25</td><td>33.84</td><td>0.97</td></tr>
-              <tr><td>Vision-Language</td><td>Vision-Language</td><td>CLIP</td><td>Image-Text Alignment</td><td>53.85</td><td>11.30</td><td>14.65</td><td>7.62</td><td>34.35</td><td>0.98</td></tr>
-              <tr><td>Vision-Language</td><td>Vision-Language</td><td>SigLIP</td><td>Image-Text Alignment</td><td>40.91</td><td>41.87</td><td>27.52</td><td>40.19</td><td>38.54</td><td>1.27</td></tr>
-              <tr><td>Vision-Language</td><td>Reconstruction</td><td>Stable Diffusion</td><td>Generation</td><td>50.39</td><td>21.50</td><td>21.22</td><td>15.64</td><td>33.81</td><td>1.30</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<section class="section" id="BibTeX">
-  <div class="container is-max-desktop content">
-    <h2 class="title">BibTeX</h2>
-    <pre><code>@misc{cavada2026newtphys,
-  title        = {NewtPhys: Do Foundation Models Understand Newtonian Physics?},
-  author       = {Sebastian Cavada and Soumava Paul and Tuan-Hung Vu and Andrei Bursuc and Raoul de Charette},
-  year         = {2026}
-}</code></pre>
-  </div>
-</section>
-
-
-<footer class="footer">
-  <div class="container">
-    <div class="columns is-centered">
-      <div class="column is-8">
-        <div class="content">
-          <p>
-            Website adapted from the <a href="https://github.com/nerfies/nerfies.github.io">Nerfies project template</a>. Source repository: <a href="https://github.com/Sebo-the-tramp/newtphys">Sebo-the-tramp/newtphys</a>.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</footer>
-
+      <figure class="preview">
+        <img src="./static/images/newtphys/collage_sl1_sa7_f1_teaser.png"
+             alt="Preview collage of NewtPhys scenes with physics annotations.">
+        <figcaption class="preview-caption">
+          Preview: real-world scenes with force, motion, visibility, and collision annotations.
+        </figcaption>
+      </figure>
+    </section>
+  </main>
 </body>
 </html>
