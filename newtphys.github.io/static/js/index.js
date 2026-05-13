@@ -26,22 +26,38 @@ function initMapOverlayPlayer() {
   }
 
   var playerVideo = document.getElementById('newtphys-map-video');
+  var sceneSwitcher = player.querySelector('.map-scene-switcher');
   var buttons = Array.prototype.slice.call(player.querySelectorAll('.map-toggle-button'));
-  var sceneButtons = Array.prototype.slice.call(player.querySelectorAll('.map-scene-button'));
+  var rgbButton = player.querySelector('.map-toggle-button[data-map-role="rgb"]') || buttons[0];
+  var overlayButtons = buttons.filter(function(button) {
+    return button !== rgbButton;
+  });
+  var manifestPath = player.dataset.manifestPath || '';
+  var sceneButtons = [];
+  var sceneRecordsByPath = {};
 
-  if (!playerVideo || !buttons.length || !sceneButtons.length) {
+  if (!playerVideo || !buttons.length || !sceneSwitcher) {
     return;
   }
 
   var activeScenePath = playerVideo.dataset.scenePath || '';
+  var activeOverlayButton = null;
 
-  function buildSceneAssetPath(fileName) {
-    return activeScenePath + '/' + fileName;
+  function buildSceneAssetPath(scenePath, fileName) {
+    return scenePath + '/' + fileName;
   }
 
-  function updateButtonState(activeButton) {
+  function getSceneRecord(scenePath) {
+    return sceneRecordsByPath[scenePath] || null;
+  }
+
+  function getButtonVideoFile(button) {
+    return button ? (button.dataset.videoFile || '') : '';
+  }
+
+  function updateButtonState() {
     buttons.forEach(function(button) {
-      var isActive = button === activeButton;
+      var isActive = (button === rgbButton && !button.disabled) || button === activeOverlayButton;
       button.classList.toggle('is-active', isActive);
       button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
     });
@@ -55,25 +71,93 @@ function initMapOverlayPlayer() {
     });
   }
 
-  function getActiveMapButton() {
-    for (var i = 0; i < buttons.length; i++) {
-      if (buttons[i].classList.contains('is-active')) {
-        return buttons[i];
+  function updateOverlayAvailability() {
+    var sceneRecord = getSceneRecord(activeScenePath);
+
+    buttons.forEach(function(button) {
+      var fileName = getButtonVideoFile(button);
+      var isEnabled = true;
+      var disabledReason = '';
+      var hasAvailabilityData = sceneRecord && sceneRecord.available_files && sceneRecord.available_files.length;
+
+      if (hasAvailabilityData) {
+        isEnabled = sceneRecord.available_files.indexOf(fileName) !== -1;
+        disabledReason = (sceneRecord.disabled_files && sceneRecord.disabled_files[fileName]) || '';
+      }
+
+      button.classList.toggle('is-disabled', !isEnabled);
+      button.disabled = !isEnabled;
+      button.setAttribute('aria-disabled', isEnabled ? 'false' : 'true');
+
+      if (disabledReason) {
+        button.title = disabledReason;
+      } else {
+        button.removeAttribute('title');
+      }
+    });
+
+    if (activeOverlayButton && activeOverlayButton.disabled) {
+      activeOverlayButton = null;
+    }
+
+    if ((!rgbButton || rgbButton.disabled) && !activeOverlayButton) {
+      activeOverlayButton = getFirstAvailableOverlayButton();
+    }
+
+    updateButtonState();
+  }
+
+  function getFirstAvailableButton(candidates) {
+    for (var i = 0; i < candidates.length; i++) {
+      if (!candidates[i].disabled) {
+        return candidates[i];
       }
     }
 
-    return buttons[0];
+    return null;
   }
 
-  function setVideoSource(fileName, shouldAutoplay) {
-    if (!fileName || !activeScenePath) {
+  function getFirstAvailableOverlayButton() {
+    return getFirstAvailableButton(overlayButtons);
+  }
+
+  function getFallbackButton() {
+    if (rgbButton && !rgbButton.disabled) {
+      return rgbButton;
+    }
+
+    return getFirstAvailableOverlayButton();
+  }
+
+  function getCurrentSourceButton() {
+    if (activeOverlayButton && !activeOverlayButton.disabled) {
+      return activeOverlayButton;
+    }
+
+    return getFallbackButton();
+  }
+
+  function getCurrentVideoFile() {
+    return getButtonVideoFile(getCurrentSourceButton());
+  }
+
+  function getCurrentVideoSource() {
+    var currentVideoFile = getCurrentVideoFile();
+    if (!activeScenePath || !currentVideoFile) {
+      return '';
+    }
+
+    return buildSceneAssetPath(activeScenePath, currentVideoFile);
+  }
+
+  function setVideoSource(nextSource, shouldAutoplay) {
+    if (!nextSource || !activeScenePath) {
       return;
     }
 
-    playerVideo.dataset.videoFile = fileName;
-    var nextSource = buildSceneAssetPath(fileName);
     var normalizedNextSource = nextSource.replace(/^\.\//, '');
     var currentSource = playerVideo.currentSrc || '';
+    playerVideo.dataset.shouldAutoplay = shouldAutoplay ? 'true' : 'false';
 
     if (currentSource.endsWith(normalizedNextSource)) {
       if (shouldAutoplay) {
@@ -96,38 +180,225 @@ function initMapOverlayPlayer() {
     }
   }
 
+  playerVideo.addEventListener('error', function() {
+    var shouldAutoplay = playerVideo.dataset.shouldAutoplay === 'true';
+    var fallbackButton = getFallbackButton();
+    var fallbackFile = getButtonVideoFile(fallbackButton);
+    var fallbackSource = fallbackFile ? buildSceneAssetPath(activeScenePath, fallbackFile) : '';
+    var normalizedFallbackSource = fallbackSource.replace(/^\.\//, '');
+    var currentSource = playerVideo.currentSrc || playerVideo.src || '';
+
+    if (!fallbackSource || currentSource.endsWith(normalizedFallbackSource)) {
+      return;
+    }
+
+    activeOverlayButton = fallbackButton && fallbackButton !== rgbButton ? fallbackButton : null;
+    playerVideo.dataset.videoFile = getCurrentVideoFile();
+    updateButtonState();
+    playerVideo.src = fallbackSource;
+    playerVideo.load();
+
+    if (shouldAutoplay) {
+      var playPromise = playerVideo.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(function() {});
+      }
+    }
+  });
+
+  function activateOverlay(button) {
+    if (!button || button.disabled) {
+      return;
+    }
+
+    activeOverlayButton = button;
+    updateButtonState();
+    playerVideo.dataset.videoFile = getCurrentVideoFile();
+    setVideoSource(getCurrentVideoSource(), !playerVideo.paused);
+  }
+
+  function deactivateOverlay() {
+    activeOverlayButton = null;
+    updateButtonState();
+    playerVideo.dataset.videoFile = getCurrentVideoFile();
+    setVideoSource(getCurrentVideoSource(), !playerVideo.paused);
+  }
+
   function activateScene(button) {
     updateSceneButtonState(button);
     activeScenePath = button.dataset.scenePath || activeScenePath;
     playerVideo.dataset.scenePath = activeScenePath;
-    setVideoSource(getActiveMapButton().dataset.videoFile || '_fps-25_render.mp4', !playerVideo.paused);
+    updateOverlayAvailability();
+    playerVideo.dataset.videoFile = getCurrentVideoFile();
+    setVideoSource(getCurrentVideoSource(), !playerVideo.paused);
   }
 
-  function activateMap(button) {
-    updateButtonState(button);
-    setVideoSource(button.dataset.videoFile || '_fps-25_render.mp4', !playerVideo.paused);
+  function refreshSceneButtons() {
+    sceneButtons = Array.prototype.slice.call(sceneSwitcher.querySelectorAll('.map-scene-button'));
+  }
+
+  function bindSceneButtons() {
+    sceneButtons.forEach(function(button) {
+      button.addEventListener('click', function() {
+        activateScene(button);
+      });
+    });
+  }
+
+  function buildSceneButtons(sceneRecords, activePath) {
+    Array.prototype.slice.call(sceneSwitcher.querySelectorAll('.map-scene-button')).forEach(function(button) {
+      button.remove();
+    });
+
+    sceneRecords.forEach(function(record) {
+      var button = document.createElement('button');
+      var isActive = record.path === activePath;
+
+      button.className = isActive ? 'map-scene-button is-active' : 'map-scene-button';
+      button.type = 'button';
+      button.dataset.scenePath = record.path;
+      button.dataset.availableVideos = (record.available_files || []).join(',');
+      button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      button.textContent = record.label;
+      sceneSwitcher.appendChild(button);
+    });
+
+    refreshSceneButtons();
+    bindSceneButtons();
+  }
+
+  function primeSceneRecordsFromButtons() {
+    sceneRecordsByPath = {};
+    refreshSceneButtons();
+    sceneButtons.forEach(function(button) {
+      var scenePath = button.dataset.scenePath || '';
+      if (!scenePath) {
+        return;
+      }
+
+      var availableFiles = (button.dataset.availableVideos || '')
+        .split(',')
+        .map(function(fileName) {
+          return fileName.trim();
+        })
+        .filter(function(fileName) {
+          return Boolean(fileName);
+        });
+      var disabledFiles = {};
+
+      buttons.forEach(function(toggleButton) {
+        var fileName = getButtonVideoFile(toggleButton);
+        if (fileName && availableFiles.length && availableFiles.indexOf(fileName) === -1) {
+          disabledFiles[fileName] = 'Not available for this scene.';
+        }
+      });
+
+      sceneRecordsByPath[scenePath] = {
+        label: button.textContent.trim(),
+        path: scenePath,
+        available_files: availableFiles.length ? availableFiles : null,
+        disabled_files: disabledFiles
+      };
+    });
+  }
+
+  function applyManifest(manifest) {
+    if (!manifest || !manifest.scenes || !manifest.scenes.length) {
+      return;
+    }
+
+    var nextActivePath = activeScenePath;
+    sceneRecordsByPath = {};
+
+    manifest.scenes.forEach(function(record) {
+      sceneRecordsByPath[record.path] = record;
+    });
+
+    if (!sceneRecordsByPath[nextActivePath]) {
+      nextActivePath = manifest.scenes[0].path;
+    }
+
+    buildSceneButtons(manifest.scenes, nextActivePath);
+
+    var initialSceneButton = sceneButtons[0];
+    for (var i = 0; i < sceneButtons.length; i++) {
+      if (sceneButtons[i].dataset.scenePath === nextActivePath) {
+        initialSceneButton = sceneButtons[i];
+        break;
+      }
+    }
+
+    if (initialSceneButton) {
+      activeScenePath = initialSceneButton.dataset.scenePath || nextActivePath;
+      playerVideo.dataset.scenePath = activeScenePath;
+      updateSceneButtonState(initialSceneButton);
+      updateOverlayAvailability();
+      playerVideo.dataset.videoFile = getCurrentVideoFile();
+      setVideoSource(getCurrentVideoSource(), !playerVideo.paused);
+    }
+  }
+
+  function getActiveOverlayButton() {
+    for (var i = 0; i < overlayButtons.length; i++) {
+      if (overlayButtons[i].classList.contains('is-active') && !overlayButtons[i].disabled) {
+        return overlayButtons[i];
+      }
+    }
+
+    return null;
   }
 
   buttons.forEach(function(button) {
     button.addEventListener('click', function() {
-      activateMap(button);
+      if (button.disabled) {
+        return;
+      }
+
+      if (button === rgbButton) {
+        deactivateOverlay();
+        return;
+      }
+
+      if (button === activeOverlayButton) {
+        if (!rgbButton || rgbButton.disabled) {
+          return;
+        }
+
+        deactivateOverlay();
+        return;
+      }
+
+      activateOverlay(button);
     });
   });
 
-  sceneButtons.forEach(function(button) {
-    button.addEventListener('click', function() {
-      activateScene(button);
-    });
-  });
+  primeSceneRecordsFromButtons();
+  bindSceneButtons();
 
   var initialSceneButton = player.querySelector('.map-scene-button.is-active') || sceneButtons[0];
-  updateSceneButtonState(initialSceneButton);
-  activeScenePath = initialSceneButton.dataset.scenePath || '';
+  if (initialSceneButton) {
+    updateSceneButtonState(initialSceneButton);
+    activeScenePath = initialSceneButton.dataset.scenePath || '';
+  }
   playerVideo.dataset.scenePath = activeScenePath;
+  activeOverlayButton = getActiveOverlayButton();
+  updateOverlayAvailability();
+  playerVideo.dataset.videoFile = getCurrentVideoFile();
+  setVideoSource(getCurrentVideoSource(), !playerVideo.paused);
 
-  var initialMapButton = getActiveMapButton();
-  updateButtonState(initialMapButton);
-  playerVideo.dataset.videoFile = initialMapButton.dataset.videoFile || '_fps-25_render.mp4';
+  if (window.fetch && manifestPath) {
+    fetch(manifestPath, {cache: 'no-store'})
+      .then(function(response) {
+        if (!response.ok) {
+          throw new Error('Failed to load map manifest.');
+        }
+        return response.json();
+      })
+      .then(function(manifest) {
+        applyManifest(manifest);
+      })
+      .catch(function() {});
+  }
 }
 
 

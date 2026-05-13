@@ -16,6 +16,11 @@ BLACK_KEY_FILTER = (
     "[0:v][fg]overlay=format=auto,format=yuv420p[v]"
 )
 
+SCENEFLOW_FILTER = (
+    "[1:v]eq=saturation=2,format=rgba,colorkey=black:0.04:0.08[fg];"
+    "[0:v][fg]overlay=format=auto,format=yuv420p[v]"
+)
+
 INSTANCES_FILTER = (
     "[1:v]format=rgba,"
     "geq="
@@ -28,6 +33,7 @@ INSTANCES_FILTER = (
 )
 
 FILTERS_BY_FILENAME = {
+    "_fps-25_sceneflow.mp4": SCENEFLOW_FILTER,
     "_fps-25_instances.mp4": INSTANCES_FILTER,
 }
 
