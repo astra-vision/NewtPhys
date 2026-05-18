@@ -1,0 +1,1912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Browse the NewtPhys VQA benchmark with category, subcategory, question ID, and object-count filters.">
+  <title>NewtPhys VQA</title>
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍎</text></svg>'>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans:400,500,700"
+        rel="stylesheet">
+  <link rel="stylesheet" href="../static/css/bulma.min.css">
+  <link rel="stylesheet" href="../static/css/index.css">
+
+  <style>
+    :root {
+      --page-bg: #ffffff;
+      --surface: #ffffff;
+      --surface-muted: #f6f6f6;
+      --surface-strong: #fafafa;
+      --border: #d9d9d9;
+      --border-strong: #8f8f8f;
+      --text: #111111;
+      --muted: #5d5d5d;
+      --accent: #111111;
+      --accent-dark: #000000;
+      --accent-soft: #efefef;
+      --shadow-soft: 0 16px 36px rgba(0, 0, 0, 0.04);
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 10px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background: var(--page-bg);
+      color: var(--text);
+      font-family: "Noto Sans", sans-serif;
+    }
+
+    .page-shell {
+      padding: 0.15rem clamp(1.1rem, 3vw, 2.1rem) 2rem;
+    }
+
+    .viewer-shell {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+    }
+
+    .viewer-section.section {
+      padding: 0;
+    }
+
+    .hero.browser-hero {
+      background: transparent;
+    }
+
+    .browser-hero .hero-body {
+      padding: 1rem 0 1.1rem;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      margin: 0;
+      padding: 0.22rem 0.6rem;
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      background: var(--surface-muted);
+      color: var(--accent-dark);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .viewer-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.9rem;
+      margin-bottom: 0.9rem;
+      flex-wrap: wrap;
+    }
+
+    .viewer-link-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .viewer-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.72rem 1rem;
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--accent-dark);
+      font-size: 0.92rem;
+      font-weight: 700;
+      line-height: 1;
+      text-decoration: none;
+      transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease;
+    }
+
+    .viewer-link:hover {
+      border-color: var(--accent-dark);
+      background: var(--surface-muted);
+      color: var(--accent-dark);
+    }
+
+    .viewer-link.is-primary {
+      border-color: var(--accent-dark);
+      background: var(--accent-dark);
+      color: #ffffff;
+    }
+
+    .viewer-link.is-primary:hover {
+      background: #1f1f1f;
+      color: #ffffff;
+    }
+
+    .hero-copy {
+      max-width: none;
+      padding: 1.25rem 1.35rem 1.4rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .hero-copy .title {
+      margin: 0;
+      padding: 0;
+      color: var(--accent-dark);
+      font-family: "Google Sans", sans-serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+
+    .title-emoji {
+      line-height: 1;
+    }
+
+    .hero-copy .subtitle {
+      max-width: 72rem;
+      margin: 0.55rem 0 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .control-panel {
+      padding: 1.15rem 1.15rem 1.2rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .filter-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 1rem;
+      flex-wrap: nowrap;
+    }
+
+    .filter-field {
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 0.9rem 0.95rem 1rem;
+      border: 1px solid rgba(17, 17, 17, 0.12);
+      border-radius: 14px;
+      background: var(--surface-muted);
+    }
+
+    .control-panel .label {
+      margin-bottom: 0.45rem;
+      color: var(--accent-dark);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .control-panel .select,
+    .control-panel .select select {
+      width: 100%;
+    }
+
+    .control-panel .select select {
+      height: 3rem;
+      border-radius: var(--radius-sm);
+      border-color: var(--border-strong);
+      background: rgba(255, 255, 255, 0.98);
+      color: var(--text);
+      box-shadow: none;
+      font-weight: 600;
+      padding-left: 0.9rem;
+      padding-right: 2.3rem;
+    }
+
+    .control-panel .select:not(.is-multiple):not(.is-loading)::after {
+      border-color: var(--accent-dark);
+    }
+
+    .summary-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding: 1rem 1.05rem;
+      border: 1px solid rgba(17, 17, 17, 0.14);
+      border-radius: 14px;
+      background: var(--surface-strong);
+      flex-wrap: wrap;
+    }
+
+    .summary-copy {
+      color: var(--muted);
+      font-size: 0.96rem;
+      line-height: 1.55;
+    }
+
+    .summary-copy strong {
+      color: var(--accent-dark);
+    }
+
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .page-pill {
+      min-width: auto;
+      padding: 0 0.15rem;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: var(--accent-dark);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .action-button {
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.98);
+      color: var(--accent-dark);
+      font-weight: 700;
+      box-shadow: none;
+    }
+
+    .action-button:hover:not([disabled]) {
+      border-color: var(--accent-dark);
+      color: var(--accent-dark);
+    }
+
+    #nextButton,
+    #nextButtonBottom {
+      border-color: var(--accent-dark);
+      background: var(--accent-dark);
+      color: #ffffff;
+    }
+
+    #nextButton:hover:not([disabled]),
+    #nextButtonBottom:hover:not([disabled]) {
+      border-color: #1f1f1f;
+      background: #1f1f1f;
+      color: #ffffff;
+    }
+
+    .results-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1.35rem;
+    }
+
+    .results-footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 1.1rem;
+    }
+
+    .results-footer[hidden] {
+      display: none;
+    }
+
+    .results-footer .pagination-controls {
+      padding: 0.8rem 0.95rem;
+      border: 1px solid rgba(17, 17, 17, 0.14);
+      border-radius: 14px;
+      background: var(--surface-strong);
+    }
+
+    .site-footer {
+      padding: 1.25rem 0 0.25rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .question-card {
+      display: grid;
+      width: 100%;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.9fr);
+      border: 1px solid rgba(17, 17, 17, 0.14);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .card-media {
+      min-width: 0;
+      padding: 1rem;
+      border-right: 1px solid rgba(17, 17, 17, 0.1);
+      background: var(--surface-muted);
+    }
+
+    .media-shell {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      aspect-ratio: 16 / 9;
+      border: 1px solid rgba(17, 17, 17, 0.12);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .sequence-stage {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .media-shell.is-loading::before {
+      content: "Loading frames...";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.9);
+      z-index: 1;
+    }
+
+    .frame-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      max-width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      background: #ffffff;
+      opacity: 0;
+    }
+
+    .frame-image.is-active {
+      opacity: 1;
+    }
+
+    .media-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .media-section-title {
+      margin: 0 0 0.45rem;
+      color: var(--accent-dark);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .answer-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.7rem;
+    }
+
+    .answer-cell {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      border: 1px solid rgba(17, 17, 17, 0.12);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .answer-cell.is-correct {
+      border-color: var(--accent-dark);
+    }
+
+    .answer-cell.is-broken {
+      display: grid;
+      place-items: center;
+      padding: 0.75rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .answer-cell.is-broken img {
+      display: none;
+    }
+
+    .answer-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      background: #ffffff;
+    }
+
+    .answer-label {
+      position: absolute;
+      top: 0.55rem;
+      left: 0.55rem;
+      z-index: 1;
+      padding: 0.25rem 0.48rem;
+      border-radius: 999px;
+      background: rgba(17, 17, 17, 0.82);
+      color: #ffffff;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+    }
+
+    .answer-label.is-correct {
+      background: var(--accent-dark);
+      color: #ffffff;
+      font-weight: 900;
+    }
+
+    .media-badge,
+    .frame-counter {
+      position: absolute;
+      z-index: 2;
+      padding: 0.3rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(17, 17, 17, 0.82);
+      color: #ffffff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .media-badge {
+      top: 0.75rem;
+      left: 0.75rem;
+    }
+
+    .frame-counter {
+      right: 0.75rem;
+      bottom: 0.75rem;
+    }
+
+    .media-shell.is-broken {
+      display: grid;
+      place-items: center;
+      padding: 1rem;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .media-shell.is-broken img {
+      display: none;
+    }
+
+    .card-info {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+    }
+
+    .question-card .card-top {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid rgba(17, 17, 17, 0.1);
+    }
+
+    .card-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .idx-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-dark);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .frame-meta {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .simulation-name {
+      overflow: hidden;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .question-id-line {
+      margin-top: 0.15rem;
+      overflow: hidden;
+      color: var(--accent-dark);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .question-meta-line {
+      margin-top: 0.24rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .scene-name {
+      margin-top: 0.24rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .card-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      padding: 1rem 1.25rem 1.25rem;
+    }
+
+    .question-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 0.95rem;
+    }
+
+    .question-text {
+      margin: 0;
+      color: var(--text);
+      font-size: 1rem;
+      line-height: 1.72;
+      white-space: pre-line;
+    }
+
+    .answer-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .answer-line {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.58;
+    }
+
+    .answer-line.is-correct {
+      color: var(--accent-dark);
+      font-weight: 800;
+    }
+
+    .card-footer-note {
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(17, 17, 17, 0.1);
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.94);
+      transition: opacity 180ms ease;
+    }
+
+    .loading-overlay.is-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-panel {
+      width: min(28rem, 100%);
+      padding: 2rem 1.75rem;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      text-align: center;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .spinner {
+      width: 3rem;
+      height: 3rem;
+      margin: 0 auto 1rem;
+      border: 3px solid #ececec;
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.85s linear infinite;
+    }
+
+    .loading-title {
+      margin-bottom: 0.3rem;
+      color: var(--text);
+      font-family: "Google Sans", sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .loading-copy {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .is-hidden-visually {
+      position: absolute !important;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media screen and (max-width: 1024px) {
+      .question-card {
+        grid-template-columns: 1fr;
+      }
+
+      .card-media {
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+      }
+    }
+
+    @media screen and (max-width: 900px) {
+      .filter-row {
+        flex-wrap: wrap;
+      }
+
+      .filter-field {
+        min-width: 220px;
+      }
+    }
+
+    @media screen and (max-width: 768px) {
+      .browser-hero .hero-body {
+        padding-top: 0.7rem;
+        padding-bottom: 0.8rem;
+      }
+
+      .page-shell {
+        padding: 0.15rem 0.9rem 1.5rem;
+      }
+
+      .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .filter-field {
+        min-width: 100%;
+      }
+
+      .summary-row {
+        align-items: stretch;
+      }
+
+      .pagination-controls {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .page-pill {
+        flex: 0 0 auto;
+      }
+
+      .results-footer {
+        justify-content: stretch;
+      }
+
+      .results-footer .pagination-controls {
+        width: 100%;
+      }
+
+      .viewer-topbar {
+        align-items: flex-start;
+      }
+
+      .viewer-link-group {
+        width: 100%;
+      }
+
+      .viewer-link {
+        flex: 1 1 12rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="loadingOverlay" class="loading-overlay" role="status" aria-live="polite">
+    <div class="loading-panel">
+      <div class="spinner" aria-hidden="true"></div>
+      <p class="loading-title">Loading VQA data</p>
+      <p id="loadingMessage" class="loading-copy">
+        Fetching <code>test_run_28_general-all_karo_10K.reduced.json</code> and preparing the VQA browser.
+      </p>
+    </div>
+  </div>
+
+  <div class="page-shell">
+    <section class="hero browser-hero">
+      <div class="hero-body">
+        <div class="viewer-shell">
+          <div class="viewer-topbar">
+            <span class="eyebrow">Interactive VQA Viewer</span>
+            <div class="viewer-link-group">
+              <a class="viewer-link" href="../">Return to Website</a>
+              <a class="viewer-link is-primary" href="https://huggingface.co/datasets/sebothetramp/test_newtphys" target="_blank" rel="noopener noreferrer">Download Dataset</a>
+            </div>
+          </div>
+          <div class="hero-copy">
+            <h1 class="title is-2 publication-title is-centered">NewtPhys VQA viewer</h1>
+            <!-- </br>
+            <p class="subtitle is-8">
+              Browse the NewtPhys visual question answering benchmark.
+            </p> -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section pt-0 viewer-section">
+      <div class="viewer-shell">
+        <div class="box control-panel">
+          <div class="filter-row">
+            <div class="filter-field">
+              <label class="label" for="categorySelect">Category</label>
+              <div class="select is-fullwidth">
+                <select id="categorySelect" aria-describedby="filtersHelp"></select>
+              </div>
+            </div>
+            <div class="filter-field">
+              <label class="label" for="subcategorySelect">Subcategory</label>
+              <div class="select is-fullwidth">
+                <select id="subcategorySelect" aria-describedby="filtersHelp"></select>
+              </div>
+            </div>
+            <div class="filter-field">
+              <label class="label" for="questionSelect">Question ID</label>
+              <div class="select is-fullwidth">
+                <select id="questionSelect" aria-describedby="filtersHelp"></select>
+              </div>
+            </div>
+            <div class="filter-field">
+              <label class="label" for="objectCountSelect">Object Count</label>
+              <div class="select is-fullwidth">
+                <select id="objectCountSelect" aria-describedby="filtersHelp"></select>
+              </div>
+            </div>
+          </div>
+
+          <p id="filtersHelp" class="help status-note is-hidden-visually">
+            The dropdowns are linked. Category, subcategory, and question selections can each span all available values and update the available object-count choices extracted from the simulation folder path.
+          </p>
+
+          <div class="summary-row">
+            <p id="resultSummary" class="summary-copy">Waiting for VQA data...</p>
+            <div class="pagination-controls">
+              <button id="prevButton" class="button action-button" type="button">Previous</button>
+              <div id="pageIndicator" class="page-pill">Page 1 / 1</div>
+              <button id="nextButton" class="button action-button" type="button">Next</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="resultsGrid" class="results-grid" aria-live="polite"></div>
+        <div id="resultsFooter" class="results-footer">
+          <div class="pagination-controls">
+            <button id="prevButtonBottom" class="button action-button" type="button">Previous</button>
+            <div id="pageIndicatorBottom" class="page-pill">Page 1 / 1</div>
+            <button id="nextButtonBottom" class="button action-button" type="button">Next</button>
+          </div>
+        </div>
+
+        <footer class="site-footer">
+          made with ❤️ by Sebastian and codex
+        </footer>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const DATA_URL = "./test_run_28_general-all_karo_10K.reduced.json";
+    const ANSWER_DATA_URL = "./val_answer_run_28_general.reduced.json";
+    const ALL_VALUE = "all";
+    const IMAGE_URL_PREFIX = "https://huggingface.co/datasets/sebothetramp/test_newtphys/resolve/main/";
+    const IMAGE_URL_SUFFIX = "?download=true";
+    const PAGE_SIZE = 12;
+    const SEQUENCE_INTERVAL_MS = 560;
+    const ANSWER_GRID_ONLY_QIDS = new Set([
+      "F_COLLISION_OBJECT_OBJECT_FRAME_MULTI",
+    ]);
+    const SEQUENCE_WITH_ANSWER_GRID_QIDS = new Set([
+      "F_TEMPORAL_PREDICTION_NEXT_IMAGE_GRANULARITY_1",
+      "F_TEMPORAL_PREDICTION_NEXT_IMAGE_GRANULARITY_2",
+      "F_TEMPORAL_PREDICTION_NEXT_IMAGE_GRANULARITY_5",
+      "F_TEMPORAL_PREDICTION_PREVIOUS_IMAGE",
+    ]);
+    const SPECIAL_CHOICE_QIDS = new Set([
+      ...ANSWER_GRID_ONLY_QIDS,
+      ...SEQUENCE_WITH_ANSWER_GRID_QIDS,
+    ]);
+
+    const elements = {
+      loadingOverlay: document.getElementById("loadingOverlay"),
+      loadingMessage: document.getElementById("loadingMessage"),
+      categorySelect: document.getElementById("categorySelect"),
+      subcategorySelect: document.getElementById("subcategorySelect"),
+      questionSelect: document.getElementById("questionSelect"),
+      objectCountSelect: document.getElementById("objectCountSelect"),
+      resultSummary: document.getElementById("resultSummary"),
+      pageIndicator: document.getElementById("pageIndicator"),
+      pageIndicatorBottom: document.getElementById("pageIndicatorBottom"),
+      prevButton: document.getElementById("prevButton"),
+      prevButtonBottom: document.getElementById("prevButtonBottom"),
+      nextButton: document.getElementById("nextButton"),
+      nextButtonBottom: document.getElementById("nextButtonBottom"),
+      resultsGrid: document.getElementById("resultsGrid"),
+      resultsFooter: document.getElementById("resultsFooter"),
+    };
+
+    const state = {
+      data: null,
+      answerByIdx: new Map(),
+      objectCountBySimulationIndex: [],
+      categories: [],
+      questionEntries: [],
+      questionMetaByCategory: new Map(),
+      questionMetaCounts: [],
+      recordsByQuestionMetaIndex: [],
+      selectedCategory: ALL_VALUE,
+      selectedSubcategory: ALL_VALUE,
+      selectedQuestionMetaIndex: ALL_VALUE,
+      selectedObjectCount: ALL_VALUE,
+      currentPage: 1,
+    };
+
+    const numberFormatter = new Intl.NumberFormat("en-US");
+    const sequencePlayers = new Map();
+    let sequenceObserver = null;
+
+    function setLoadingMessage(message) {
+      elements.loadingMessage.textContent = message;
+    }
+
+    function showStatus(message) {
+      elements.resultSummary.textContent = message;
+      elements.resultsGrid.innerHTML = "";
+      elements.resultsFooter.hidden = true;
+    }
+
+    function hideStatus() {
+      elements.resultsFooter.hidden = false;
+    }
+
+    function nextFrame() {
+      return new Promise((resolve) => {
+        requestAnimationFrame(() => resolve());
+      });
+    }
+
+    function createOption(value, label) {
+      const option = document.createElement("option");
+      option.value = String(value);
+      option.textContent = label;
+      return option;
+    }
+
+    function getQuestionMeta(index) {
+      return state.data.question_meta[index];
+    }
+
+    function uniqueSorted(values) {
+      return Array.from(new Set(values)).sort((left, right) => left.localeCompare(right));
+    }
+
+    function parseQuestionContent(rawQuestion, questionId) {
+      const promptLines = [];
+      const choices = [];
+      let currentChoice = null;
+
+      String(rawQuestion)
+        .replace(/<image>/g, "")
+        .split("\n")
+        .forEach((line) => {
+          const trimmed = line.trim();
+          if (!trimmed) {
+            if (!currentChoice && promptLines[promptLines.length - 1] !== "") {
+              promptLines.push("");
+            }
+            return;
+          }
+
+          const match = trimmed.match(/^([A-D])\.\s*(.*)$/);
+          if (match) {
+            currentChoice = {
+              letter: match[1],
+              text: match[2].trim(),
+            };
+            choices.push(currentChoice);
+            return;
+          }
+
+          if (currentChoice) {
+            currentChoice.text = `${currentChoice.text} ${trimmed}`.trim();
+          } else {
+            promptLines.push(trimmed);
+          }
+        });
+
+      let prompt = promptLines.join("\n").replace(/\n{3,}/g, "\n\n");
+      if (SPECIAL_CHOICE_QIDS.has(questionId)) {
+        prompt = prompt.replace(/\n{2,}/g, "\n");
+      }
+
+      return {
+        prompt: prompt.trim(),
+        choices,
+      };
+    }
+
+    function createQuestionContent(rawQuestion, questionId, correctAnswer) {
+      const { prompt, choices } = parseQuestionContent(rawQuestion, questionId);
+      const wrapper = document.createElement("div");
+      wrapper.className = "question-copy";
+
+      if (prompt) {
+        const promptNode = document.createElement("p");
+        promptNode.className = "question-text";
+        promptNode.textContent = prompt;
+        wrapper.appendChild(promptNode);
+      }
+
+      if (choices.length) {
+        const answerList = document.createElement("div");
+        answerList.className = "answer-list";
+
+        choices.forEach((choice) => {
+          const line = document.createElement("div");
+          line.className = "answer-line";
+          if (choice.letter === correctAnswer) {
+            line.classList.add("is-correct");
+          }
+
+          line.textContent = choice.text
+            ? `${choice.letter}. ${choice.text}`
+            : choice.letter;
+          answerList.appendChild(line);
+        });
+
+        wrapper.appendChild(answerList);
+      }
+
+      return wrapper;
+    }
+
+    function padFrameId(frameId) {
+      return String(frameId).padStart(6, "0");
+    }
+
+    function getSimulationFolder(relativePath) {
+      const parts = String(relativePath).split("/").filter(Boolean);
+      return parts.length ? parts[parts.length - 1] : String(relativePath);
+    }
+
+    function getObjectCount(relativePath) {
+      const parts = String(relativePath).split("/").filter(Boolean);
+      const value = Number(parts[1]);
+      return Number.isFinite(value) ? value : null;
+    }
+
+    function buildImageUrl(relativePath, frameId) {
+      return `${IMAGE_URL_PREFIX}${getSimulationFolder(relativePath)}/render/${padFrameId(frameId)}.png${IMAGE_URL_SUFFIX}`;
+    }
+
+    function ensureSequenceObserver() {
+      if (sequenceObserver) {
+        return;
+      }
+
+      sequenceObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const player = sequencePlayers.get(entry.target);
+          if (!player) {
+            return;
+          }
+
+          player.isVisible = entry.isIntersecting;
+
+          if (entry.isIntersecting) {
+            startSequencePlayer(player);
+          } else {
+            stopSequencePlayer(player);
+          }
+        });
+      }, {
+        threshold: 0.2,
+      });
+    }
+
+    function clearSequencePlayers() {
+      sequencePlayers.forEach((player) => {
+        stopSequencePlayer(player);
+        if (sequenceObserver) {
+          sequenceObserver.unobserve(player.container);
+        }
+      });
+      sequencePlayers.clear();
+    }
+
+    function markMediaBroken(container, message = "Image unavailable") {
+      container.classList.remove("is-loading");
+      container.classList.add("is-broken");
+      if (!container.querySelector(".broken-copy")) {
+        const copy = document.createElement("span");
+        copy.className = "broken-copy";
+        copy.textContent = message;
+        container.appendChild(copy);
+      }
+    }
+
+    function setImageSource(img, container, url, altText) {
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.alt = altText;
+      img.src = url;
+      img.addEventListener("error", () => {
+        markMediaBroken(container);
+      }, { once: true });
+    }
+
+    function createFrameImage(url, altText, isActive = false) {
+      const img = document.createElement("img");
+      img.className = `frame-image${isActive ? " is-active" : ""}`;
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.alt = altText;
+      img.src = url;
+      return img;
+    }
+
+    function createAnswerImage(url, altText) {
+      const img = document.createElement("img");
+      img.className = "answer-image";
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.alt = altText;
+      img.src = url;
+      return img;
+    }
+
+    function updateFrameCounter(counter, frameId, position, total) {
+      counter.textContent = total > 1
+        ? `f${padFrameId(frameId)} · ${position}/${total}`
+        : `f${padFrameId(frameId)}`;
+    }
+
+    function loadFrame(frame) {
+      return new Promise((resolve) => {
+        const probe = new Image();
+        probe.onload = () => resolve(frame);
+        probe.onerror = () => resolve(null);
+        probe.src = frame.url;
+      });
+    }
+
+    function setActiveSequenceIndex(player, index) {
+      const frames = player.availableFrames || player.frames;
+      if (!frames.length || !player.container.isConnected) {
+        return;
+      }
+
+      player.currentIndex = index;
+      player.imageElements.forEach((imgElement, imageIndex) => {
+        imgElement.classList.toggle("is-active", imageIndex === index);
+      });
+
+      const frame = frames[index];
+      updateFrameCounter(
+        player.counter,
+        frame.frameId,
+        index + 1,
+        frames.length,
+      );
+    }
+
+    function ensureSequenceFrames(player) {
+      if (player.preloadPromise) {
+        return player.preloadPromise;
+      }
+
+      player.container.classList.add("is-loading");
+      player.preloadPromise = Promise.all(player.frames.slice(1).map(loadFrame)).then((resolvedFrames) => {
+        if (!player.container.isConnected) {
+          return [];
+        }
+
+        const extraFrames = resolvedFrames.filter(Boolean);
+        player.availableFrames = [player.frames[0], ...extraFrames];
+        player.imageElements = [player.imageElements[0]];
+        extraFrames.forEach((frame) => {
+          const img = createFrameImage(
+            frame.url,
+            `${player.questionId} frame ${frame.frameId}`,
+          );
+          player.stage.appendChild(img);
+          player.imageElements.push(img);
+        });
+        player.container.classList.remove("is-loading");
+
+        if (player.availableFrames.length <= 1) {
+          player.badge.textContent = "Single frame";
+        }
+
+        setActiveSequenceIndex(player, 0);
+
+        return player.availableFrames;
+      });
+
+      return player.preloadPromise;
+    }
+
+    function stopSequencePlayer(player) {
+      if (player.timerId) {
+        window.clearInterval(player.timerId);
+        player.timerId = null;
+      }
+    }
+
+    function startSequencePlayer(player) {
+      if (player.timerId || !player.isVisible || player.container.classList.contains("is-broken")) {
+        return;
+      }
+
+      ensureSequenceFrames(player).then((frames) => {
+        if (
+          !player.container.isConnected
+          || player.timerId
+          || !player.isVisible
+          || !frames
+          || frames.length <= 1
+        ) {
+          return;
+        }
+
+        player.badge.textContent = "Looping sequence";
+        player.timerId = window.setInterval(() => {
+          if (!player.container.isConnected) {
+            stopSequencePlayer(player);
+            return;
+          }
+
+          const nextIndex = (player.currentIndex + 1) % frames.length;
+          setActiveSequenceIndex(player, nextIndex);
+        }, SEQUENCE_INTERVAL_MS);
+      });
+    }
+
+    function setupSequencePlayback(stage, container, relativePath, frameIds, questionId, badge, counter) {
+      const frames = frameIds.map((frameId) => ({
+        frameId,
+        url: buildImageUrl(relativePath, frameId),
+      }));
+
+      const firstFrame = frames[0];
+      const firstImage = createFrameImage(
+        firstFrame.url,
+        `${questionId} frame ${firstFrame.frameId}`,
+        true,
+      );
+      firstImage.addEventListener("error", () => {
+        markMediaBroken(container);
+      }, { once: true });
+      stage.appendChild(firstImage);
+      updateFrameCounter(counter, firstFrame.frameId, 1, frames.length);
+
+      const player = {
+        stage,
+        container,
+        questionId,
+        badge,
+        counter,
+        frames,
+        availableFrames: [firstFrame],
+        imageElements: [firstImage],
+        preloadPromise: null,
+        currentIndex: 0,
+        timerId: null,
+        isVisible: false,
+      };
+
+      sequencePlayers.set(container, player);
+      ensureSequenceObserver();
+      sequenceObserver.observe(container);
+    }
+
+    function getMediaLayout(questionId, frameIds) {
+      if (ANSWER_GRID_ONLY_QIDS.has(questionId)) {
+        return {
+          kind: "answers-only",
+          promptFrames: [],
+          answerFrames: frameIds,
+        };
+      }
+
+      if (SEQUENCE_WITH_ANSWER_GRID_QIDS.has(questionId)) {
+        return {
+          kind: "sequence-with-answers",
+          promptFrames: frameIds.slice(0, 4),
+          answerFrames: frameIds.slice(4, 8),
+        };
+      }
+
+      return {
+        kind: "default",
+        promptFrames: frameIds,
+        answerFrames: [],
+      };
+    }
+
+    function createSectionTitle(label) {
+      const title = document.createElement("p");
+      title.className = "media-section-title";
+      title.textContent = label;
+      return title;
+    }
+
+    function appendAnswerGrid(parent, relativePath, frameIds, questionId, correctAnswer = "") {
+      const grid = document.createElement("div");
+      grid.className = "answer-grid";
+      const labels = ["A", "B", "C", "D"];
+
+      frameIds.forEach((frameId, index) => {
+        const cell = document.createElement("div");
+        cell.className = "answer-cell";
+
+        const label = document.createElement("div");
+        label.className = "answer-label";
+        const answerLabel = labels[index] || String(index + 1);
+        label.textContent = answerLabel;
+
+        if (answerLabel === correctAnswer) {
+          cell.classList.add("is-correct");
+          label.classList.add("is-correct");
+        }
+
+        const img = createAnswerImage(
+          buildImageUrl(relativePath, frameId),
+          `${questionId} answer ${answerLabel}`,
+        );
+        img.addEventListener("error", () => {
+          cell.classList.add("is-broken");
+          if (!cell.querySelector(".broken-copy")) {
+            const copy = document.createElement("span");
+            copy.className = "broken-copy";
+            copy.textContent = "Image unavailable";
+            cell.appendChild(copy);
+          }
+        }, { once: true });
+
+        cell.appendChild(label);
+        cell.appendChild(img);
+        grid.appendChild(cell);
+      });
+
+      parent.appendChild(grid);
+    }
+
+    function getCategoryEntries(category) {
+      if (category === ALL_VALUE) {
+        return state.questionEntries;
+      }
+      return state.questionMetaByCategory.get(category) || [];
+    }
+
+    function getSubcategories(category) {
+      return uniqueSorted(getCategoryEntries(category).map((entry) => entry.subcategory));
+    }
+
+    function getQuestionEntries(category, subcategory) {
+      return getCategoryEntries(category)
+        .filter((entry) => subcategory === ALL_VALUE || entry.subcategory === subcategory)
+        .sort((left, right) => left.questionId.localeCompare(right.questionId));
+    }
+
+    function getSelectedQuestionEntries() {
+      const questions = getQuestionEntries(state.selectedCategory, state.selectedSubcategory);
+      if (state.selectedQuestionMetaIndex === ALL_VALUE) {
+        return questions;
+      }
+
+      return questions.filter((entry) => String(entry.index) === String(state.selectedQuestionMetaIndex));
+    }
+
+    function getSelectedQuestionMeta() {
+      if (state.selectedQuestionMetaIndex === ALL_VALUE) {
+        return null;
+      }
+
+      const index = Number(state.selectedQuestionMetaIndex);
+      return Number.isFinite(index) ? getQuestionMeta(index) : null;
+    }
+
+    function getAvailableObjectCounts() {
+      const counts = new Map();
+      getCurrentRecords().forEach((record) => {
+        const objectCount = state.objectCountBySimulationIndex[record[0]];
+        if (!Number.isFinite(objectCount)) {
+          return;
+        }
+        counts.set(objectCount, (counts.get(objectCount) || 0) + 1);
+      });
+      return Array.from(counts.entries()).sort((left, right) => left[0] - right[0]);
+    }
+
+    function populateCategories() {
+      const validValues = [ALL_VALUE, ...state.categories];
+      if (!validValues.includes(state.selectedCategory)) {
+        state.selectedCategory = ALL_VALUE;
+      }
+
+      elements.categorySelect.innerHTML = "";
+      const totalRecords = state.questionMetaCounts.reduce((sum, count) => sum + count, 0);
+      elements.categorySelect.appendChild(
+        createOption(ALL_VALUE, `All categories (${numberFormatter.format(totalRecords)})`),
+      );
+      state.categories.forEach((category) => {
+        const total = getCategoryEntries(category).reduce(
+          (sum, entry) => sum + state.questionMetaCounts[entry.index],
+          0,
+        );
+        elements.categorySelect.appendChild(
+          createOption(category, `${category} (${numberFormatter.format(total)})`),
+        );
+      });
+      elements.categorySelect.value = state.selectedCategory;
+    }
+
+    function populateSubcategories() {
+      const subcategories = getSubcategories(state.selectedCategory);
+      const validValues = [ALL_VALUE, ...subcategories];
+      if (!validValues.includes(state.selectedSubcategory)) {
+        state.selectedSubcategory = ALL_VALUE;
+      }
+
+      elements.subcategorySelect.innerHTML = "";
+      const total = getQuestionEntries(state.selectedCategory, ALL_VALUE).reduce(
+        (sum, entry) => sum + state.questionMetaCounts[entry.index],
+        0,
+      );
+      elements.subcategorySelect.appendChild(
+        createOption(ALL_VALUE, `All subcategories (${numberFormatter.format(total)})`),
+      );
+      subcategories.forEach((subcategory) => {
+        const total = getQuestionEntries(state.selectedCategory, subcategory).reduce(
+          (sum, entry) => sum + state.questionMetaCounts[entry.index],
+          0,
+        );
+        elements.subcategorySelect.appendChild(
+          createOption(subcategory, `${subcategory} (${numberFormatter.format(total)})`),
+        );
+      });
+      elements.subcategorySelect.value = state.selectedSubcategory;
+    }
+
+    function populateQuestions() {
+      const questions = getQuestionEntries(state.selectedCategory, state.selectedSubcategory);
+      const questionValues = [ALL_VALUE, ...questions.map((entry) => String(entry.index))];
+      if (!questionValues.includes(String(state.selectedQuestionMetaIndex))) {
+        state.selectedQuestionMetaIndex = ALL_VALUE;
+      }
+
+      elements.questionSelect.innerHTML = "";
+      const total = questions.reduce(
+        (sum, entry) => sum + state.questionMetaCounts[entry.index],
+        0,
+      );
+      elements.questionSelect.appendChild(
+        createOption(ALL_VALUE, `All question IDs (${numberFormatter.format(total)})`),
+      );
+      questions.forEach((entry) => {
+        const count = state.questionMetaCounts[entry.index];
+        elements.questionSelect.appendChild(
+          createOption(entry.index, `${entry.questionId} (${numberFormatter.format(count)})`),
+        );
+      });
+      elements.questionSelect.value = String(state.selectedQuestionMetaIndex);
+    }
+
+    function populateObjectCounts() {
+      const objectCounts = getAvailableObjectCounts();
+      const validValues = [ALL_VALUE, ...objectCounts.map(([count]) => String(count))];
+      if (!validValues.includes(String(state.selectedObjectCount))) {
+        state.selectedObjectCount = ALL_VALUE;
+      }
+
+      elements.objectCountSelect.innerHTML = "";
+      const total = objectCounts.reduce((sum, [, count]) => sum + count, 0);
+      elements.objectCountSelect.appendChild(
+        createOption(ALL_VALUE, `All object counts (${numberFormatter.format(total)})`),
+      );
+      objectCounts.forEach(([count, totalCount]) => {
+        const label = `${count} object${count === 1 ? "" : "s"} (${numberFormatter.format(totalCount)})`;
+        elements.objectCountSelect.appendChild(createOption(count, label));
+      });
+      elements.objectCountSelect.value = String(state.selectedObjectCount);
+    }
+
+    function syncSelects() {
+      populateCategories();
+      populateSubcategories();
+      populateQuestions();
+      populateObjectCounts();
+    }
+
+    function getCurrentRecords() {
+      return getSelectedQuestionEntries().flatMap((entry) =>
+        state.recordsByQuestionMetaIndex[entry.index] || []);
+    }
+
+    function getFilteredRecords() {
+      const records = getCurrentRecords();
+      if (state.selectedObjectCount === ALL_VALUE) {
+        return records;
+      }
+
+      return records.filter((record) =>
+        String(state.objectCountBySimulationIndex[record[0]]) === String(state.selectedObjectCount));
+    }
+
+    function createCard(record) {
+      const [simulationIndex, frameIds, rawQuestion, idx, questionMetaIndex] = record;
+      const [scene, relativePath] = state.data.simulations[simulationIndex];
+      const [questionId, category, subcategory] = getQuestionMeta(questionMetaIndex);
+      const mediaLayout = getMediaLayout(questionId, frameIds);
+      const correctAnswer = state.answerByIdx.get(String(idx)) || "";
+
+      const article = document.createElement("article");
+      article.className = "question-card";
+
+      const media = document.createElement("div");
+      media.className = "card-media";
+      const mediaStack = document.createElement("div");
+      mediaStack.className = "media-stack";
+      media.appendChild(mediaStack);
+
+      const isSingleFrame = String(idx).endsWith("_i") || frameIds.length === 1;
+
+      if (mediaLayout.kind === "answers-only") {
+        mediaStack.appendChild(createSectionTitle("Answer choices"));
+        appendAnswerGrid(
+          mediaStack,
+          relativePath,
+          mediaLayout.answerFrames,
+          questionId,
+          correctAnswer,
+        );
+      } else {
+        const mediaShell = document.createElement("div");
+        mediaShell.className = "media-shell";
+
+        const mediaBadge = document.createElement("div");
+        mediaBadge.className = "media-badge";
+
+        const frameCounter = document.createElement("div");
+        frameCounter.className = "frame-counter";
+
+        const stage = document.createElement("div");
+        stage.className = "sequence-stage";
+
+        mediaShell.appendChild(stage);
+        mediaShell.appendChild(mediaBadge);
+        mediaShell.appendChild(frameCounter);
+
+        if (mediaLayout.kind === "sequence-with-answers") {
+          mediaStack.appendChild(createSectionTitle("Prompt sequence"));
+        }
+
+        mediaStack.appendChild(mediaShell);
+
+        if (isSingleFrame) {
+          mediaBadge.textContent = "Single image";
+          updateFrameCounter(frameCounter, mediaLayout.promptFrames[0], 1, 1);
+          const img = createFrameImage(
+            buildImageUrl(relativePath, mediaLayout.promptFrames[0]),
+            `${questionId} frame ${mediaLayout.promptFrames[0]}`,
+            true,
+          );
+          img.addEventListener("error", () => {
+            markMediaBroken(mediaShell);
+          }, { once: true });
+          stage.appendChild(img);
+        } else {
+          mediaBadge.textContent = "Looping sequence";
+          setupSequencePlayback(
+            stage,
+            mediaShell,
+            relativePath,
+            mediaLayout.promptFrames,
+            questionId,
+            mediaBadge,
+            frameCounter,
+          );
+        }
+
+        if (mediaLayout.kind === "sequence-with-answers") {
+          mediaStack.appendChild(createSectionTitle("Answer choices"));
+          appendAnswerGrid(
+            mediaStack,
+            relativePath,
+            mediaLayout.answerFrames,
+            questionId,
+            correctAnswer,
+          );
+        }
+      }
+
+      const cardInfo = document.createElement("div");
+      cardInfo.className = "card-info";
+
+      const cardTop = document.createElement("div");
+      cardTop.className = "card-top";
+
+      const topLine = document.createElement("div");
+      topLine.className = "card-topline";
+
+      const idxChip = document.createElement("span");
+      idxChip.className = "idx-chip";
+      idxChip.textContent = String(idx);
+
+      const frameMeta = document.createElement("span");
+      frameMeta.className = "frame-meta";
+      frameMeta.textContent = mediaLayout.kind === "answers-only"
+        ? `${mediaLayout.answerFrames.length} answer images`
+        : mediaLayout.kind === "sequence-with-answers"
+          ? `${mediaLayout.promptFrames.length} prompt frames + ${mediaLayout.answerFrames.length} answers`
+          : frameIds.length === 1
+            ? "1 frame"
+            : `${frameIds.length} frame sequence`;
+
+      topLine.appendChild(idxChip);
+      topLine.appendChild(frameMeta);
+
+      const simulationName = document.createElement("div");
+      simulationName.className = "simulation-name";
+      simulationName.title = getSimulationFolder(relativePath);
+      simulationName.textContent = getSimulationFolder(relativePath);
+
+      const questionIdLine = document.createElement("div");
+      questionIdLine.className = "question-id-line";
+      questionIdLine.title = questionId;
+      questionIdLine.textContent = questionId;
+
+      const questionMetaLine = document.createElement("div");
+      questionMetaLine.className = "question-meta-line";
+      questionMetaLine.textContent = `${category} / ${subcategory}`;
+
+      const sceneName = document.createElement("div");
+      sceneName.className = "scene-name";
+      sceneName.textContent = `scene ${String(scene).slice(0, 12)}`;
+
+      cardTop.appendChild(topLine);
+      cardTop.appendChild(simulationName);
+      cardTop.appendChild(questionIdLine);
+      cardTop.appendChild(questionMetaLine);
+      cardTop.appendChild(sceneName);
+
+      const cardBody = document.createElement("div");
+      cardBody.className = "card-body";
+
+      const questionContent = createQuestionContent(rawQuestion, questionId, correctAnswer);
+
+      const footerNote = document.createElement("div");
+      footerNote.className = "card-footer-note";
+      footerNote.textContent = mediaLayout.kind === "answers-only"
+        ? "Four fixed answer images"
+        : mediaLayout.kind === "sequence-with-answers"
+          ? "First four frames are the prompt sequence, last four are the answer images"
+          : isSingleFrame
+            ? "Image-only entry"
+            : "Compact sequence built from the available frames";
+
+      cardBody.appendChild(questionContent);
+      cardBody.appendChild(footerNote);
+
+      cardInfo.appendChild(cardTop);
+      cardInfo.appendChild(cardBody);
+
+      article.appendChild(media);
+      article.appendChild(cardInfo);
+      return article;
+    }
+
+    function getScopeSummaryHtml() {
+      const selectedQuestionMeta = getSelectedQuestionMeta();
+      if (selectedQuestionMeta) {
+        const [questionId, category, subcategory] = selectedQuestionMeta;
+        return `<strong>${questionId}</strong> in <strong>${category}</strong> / <strong>${subcategory}</strong>`;
+      }
+
+      const categoryLabel = state.selectedCategory === ALL_VALUE
+        ? "all categories"
+        : `<strong>${state.selectedCategory}</strong>`;
+      const subcategoryLabel = state.selectedSubcategory === ALL_VALUE
+        ? "all subcategories"
+        : `<strong>${state.selectedSubcategory}</strong>`;
+      return `${categoryLabel} / ${subcategoryLabel} / all question IDs`;
+    }
+
+    function renderResults() {
+      const currentRecords = getFilteredRecords();
+      const totalRecords = currentRecords.length;
+      const pageCount = Math.max(1, Math.ceil(totalRecords / PAGE_SIZE));
+      state.currentPage = Math.min(Math.max(state.currentPage, 1), pageCount);
+
+      const startIndex = (state.currentPage - 1) * PAGE_SIZE;
+      const visibleRecords = currentRecords.slice(startIndex, startIndex + PAGE_SIZE);
+
+      clearSequencePlayers();
+      elements.resultsGrid.innerHTML = "";
+      visibleRecords.forEach((record) => {
+        elements.resultsGrid.appendChild(createCard(record));
+      });
+
+      const pageLabel = `Page ${state.currentPage} / ${pageCount}`;
+      elements.pageIndicator.textContent = pageLabel;
+      elements.pageIndicatorBottom.textContent = pageLabel;
+      elements.resultsFooter.hidden = totalRecords === 0;
+
+      const isFirstPage = state.currentPage <= 1;
+      const isLastPage = state.currentPage >= pageCount;
+      elements.prevButton.disabled = isFirstPage;
+      elements.prevButtonBottom.disabled = isFirstPage;
+      elements.nextButton.disabled = isLastPage;
+      elements.nextButtonBottom.disabled = isLastPage;
+
+      if (totalRecords === 0) {
+        elements.resultSummary.innerHTML =
+          `${getScopeSummaryHtml()}` +
+          (state.selectedObjectCount === ALL_VALUE
+            ? " has no records."
+            : ` has no records for <strong>${state.selectedObjectCount}</strong> objects.`);
+        return;
+      }
+
+      elements.resultSummary.innerHTML =
+        `${getScopeSummaryHtml()} ` +
+        (state.selectedObjectCount === ALL_VALUE
+          ? ""
+          : `for <strong>${state.selectedObjectCount}</strong> objects `) +
+        `showing ${numberFormatter.format(visibleRecords.length)} of ${numberFormatter.format(totalRecords)} records.`;
+    }
+
+    function applySelection({ resetPage = true } = {}) {
+      syncSelects();
+      if (resetPage) {
+        state.currentPage = 1;
+      }
+      renderResults();
+    }
+
+    function buildIndexes(data) {
+      const questionMetaByCategory = new Map();
+      const questionEntries = [];
+      const questionMetaCounts = Array.from({ length: data.question_meta.length }, () => 0);
+      const recordsByQuestionMetaIndex = Array.from(
+        { length: data.question_meta.length },
+        () => [],
+      );
+
+      data.question_meta.forEach(([questionId, category, subcategory], index) => {
+        if (!questionMetaByCategory.has(category)) {
+          questionMetaByCategory.set(category, []);
+        }
+        const questionEntry = {
+          index,
+          questionId,
+          category,
+          subcategory,
+        };
+        questionMetaByCategory.get(category).push(questionEntry);
+        questionEntries.push(questionEntry);
+      });
+
+      data.records.forEach((record) => {
+        const questionMetaIndex = record[4];
+        questionMetaCounts[questionMetaIndex] += 1;
+        recordsByQuestionMetaIndex[questionMetaIndex].push(record);
+      });
+
+      state.questionMetaByCategory = questionMetaByCategory;
+      state.questionEntries = questionEntries;
+      state.questionMetaCounts = questionMetaCounts;
+      state.recordsByQuestionMetaIndex = recordsByQuestionMetaIndex;
+      state.objectCountBySimulationIndex = data.simulations.map(([, relativePath]) =>
+        getObjectCount(relativePath));
+      state.categories = Array.from(questionMetaByCategory.keys()).sort((a, b) => a.localeCompare(b));
+      state.selectedCategory = ALL_VALUE;
+      state.selectedSubcategory = ALL_VALUE;
+      state.selectedQuestionMetaIndex = ALL_VALUE;
+      state.selectedObjectCount = ALL_VALUE;
+    }
+
+    function buildAnswerLookup(answerData) {
+      if (!answerData || !Array.isArray(answerData.records)) {
+        throw new Error("Unexpected answer dataset structure.");
+      }
+
+      const answerByIdx = new Map();
+      answerData.records.forEach((row) => {
+        const [idx, answer] = row;
+        if (typeof idx === "string" && typeof answer === "string" && answer.trim()) {
+          answerByIdx.set(idx, answer.trim());
+        }
+      });
+
+      state.answerByIdx = answerByIdx;
+    }
+
+    async function loadData() {
+      setLoadingMessage("Fetching reduced VQA JSON...");
+      await nextFrame();
+
+      const response = await fetch(DATA_URL);
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}.`);
+      }
+
+      setLoadingMessage("Parsing VQA entries...");
+      const payload = await response.text();
+      await nextFrame();
+
+      const data = JSON.parse(payload);
+      if (!data || !Array.isArray(data.question_meta) || !Array.isArray(data.records)) {
+        throw new Error("Unexpected dataset structure.");
+      }
+
+      setLoadingMessage("Fetching validation answers...");
+      await nextFrame();
+
+      const answerResponse = await fetch(ANSWER_DATA_URL);
+      if (!answerResponse.ok) {
+        throw new Error(`Answer request failed with status ${answerResponse.status}.`);
+      }
+
+      setLoadingMessage("Parsing validation answers...");
+      const answerPayload = await answerResponse.text();
+      await nextFrame();
+
+      const answerData = JSON.parse(answerPayload);
+
+      setLoadingMessage("Indexing questions and records...");
+      await nextFrame();
+
+      state.data = data;
+      buildIndexes(data);
+      buildAnswerLookup(answerData);
+    }
+
+    function bindEvents() {
+      elements.categorySelect.addEventListener("change", (event) => {
+        state.selectedCategory = event.target.value;
+        state.selectedSubcategory = ALL_VALUE;
+        state.selectedQuestionMetaIndex = ALL_VALUE;
+        state.selectedObjectCount = ALL_VALUE;
+        applySelection();
+      });
+
+      elements.subcategorySelect.addEventListener("change", (event) => {
+        state.selectedSubcategory = event.target.value;
+        state.selectedQuestionMetaIndex = ALL_VALUE;
+        state.selectedObjectCount = ALL_VALUE;
+        applySelection();
+      });
+
+      elements.questionSelect.addEventListener("change", (event) => {
+        state.selectedQuestionMetaIndex = event.target.value;
+        state.selectedObjectCount = ALL_VALUE;
+        applySelection();
+      });
+
+      elements.objectCountSelect.addEventListener("change", (event) => {
+        state.selectedObjectCount = event.target.value;
+        applySelection();
+      });
+
+      elements.prevButton.addEventListener("click", () => {
+        state.currentPage -= 1;
+        renderResults();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      elements.prevButtonBottom.addEventListener("click", () => {
+        state.currentPage -= 1;
+        renderResults();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      elements.nextButton.addEventListener("click", () => {
+        state.currentPage += 1;
+        renderResults();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      elements.nextButtonBottom.addEventListener("click", () => {
+        state.currentPage += 1;
+        renderResults();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    }
+
+    async function initialize() {
+      bindEvents();
+
+      try {
+        await loadData();
+        hideStatus();
+        applySelection();
+        elements.loadingOverlay.classList.add("is-hidden");
+      } catch (error) {
+        console.error(error);
+        elements.loadingOverlay.classList.add("is-hidden");
+        showStatus(
+          location.protocol === "file:"
+            ? "The VQA data could not be fetched from a file URL. Serve this folder over HTTP, for example with `python3 -m http.server`, and open the page through localhost."
+            : `The VQA data could not be loaded: ${error.message}`,
+        );
+        elements.resultSummary.textContent = "VQA data load failed.";
+      }
+    }
+
+    initialize();
+  </script>
+</body>
+</html>
