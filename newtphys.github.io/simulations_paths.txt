@@ -1,7 +1,0 @@
-/dl3dv/yms-variations/soft/4/c-1_no-4_d-10_s-dl3dv-all_models-hf-gso_MLP-10_smooth_h-10-40_seed-29_20251214_063652 name_1
-/dl3dv/random/5/c-1_no-5_d-10_s-dl3dv-all_models-hf-gso_MLP-10_smooth_h-10-40_seed-125_20251212_191943 name_2
-/dl3dv/yms-variations/soft/6/c-1_no-6_d-10_s-dl3dv-all_models-hf-gso_MLP-10_smooth_h-10-40_seed-14_20251214_160155 name_3
-
-/dl3dv/random/3/c-1_no-3_d-10_s-dl3dv-all_models-hf-gso_MLP-10_smooth_h-10-40_seed-5_20251212_034543 name_4
-/dl3dv/random/6/c-1_no-6_d-10_s-dl3dv-all_models-hf-gso_MLP-10_smooth_h-10-40_seed-174_20251213_072253 name_5
-/dl3dv/random/6/c-1_no-6_d-10_s-dl3dv-all_models-hf-gso_MLP-10_smooth_h-10-40_seed-181_20251213_073854 name_6
