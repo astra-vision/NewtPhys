@@ -26,8 +26,8 @@ main.synctex.gz
 !/data_viewer/
 !/data_viewer/**
 
-newtphys.github.io/video_newtphys_maps/**_og
-newtphys.github.io/vqa/val_answer_run_28_general.json
-newtphys.github.io/vqa/test_run_28_general-all_karo_10K.json
+video_newtphys_maps/**_og
+vqa/val_answer_run_28_general.json
+vqa/test_run_28_general-all_karo_10K.json
 
-newtphys.github.io/downloaded/**
+downloaded/**
