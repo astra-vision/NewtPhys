@@ -670,7 +670,7 @@
         <div class="columns is-vcentered">
           <div class="column is-two-thirds">
             <figure class="image">
-              <img src="./static/images/newtphys/acc_category_family_biggest.png"
+              <img src="./static/images/newtphys/15K_acc_category_family_biggest.png"
                    alt="Overall VQA performance across model families.">
             </figure>
             <p class="has-text-centered is-size-7">
@@ -722,17 +722,20 @@
         <h3 class="title is-4">Common-Sense Correlation</h3>
         <div class="content has-text-justified">
           <p>
-            The correlation analysis mirrors the discussion section of the paper: standard multimodal common-sense benchmarks correlate with NewtPhys only partially, and especially weakly for the low-level physics categories. This is one of the central claims of the work, namely that current benchmark ecosystems do not adequately measure Newtonian understanding.
+            Overall accuracy on NewtPhys correlates with the average performance across eight common-sense benchmarks, but this aggregate trend hides significant per-category discrepancies. Correlations are stronger for categories tied to visual attributes, such as spatial reasoning and viewpoint, while low-level physics categories show much weaker alignment.
+          </p>
+          <p>
+            In particular, material understanding and mechanics are only weakly correlated with common-sense benchmark performance. This suggests that current benchmark ecosystems still under-measure the skills required for Newtonian reasoning, such as estimating physical properties, forces, collisions, and motion.
           </p>
         </div>
-        <div class="columns is-vcentered">
-          <div class="column">
+        <div class="columns is-vcentered is-variable is-5">
+          <div class="column is-three-fifths">
             <figure class="image">
               <img src="./static/images/newtphys/cs_correlation.png"
-                   alt="Average common-sense correlation with NewtPhys performance.">
+                   alt="Overall common-sense correlation with NewtPhys performance.">
             </figure>
             <p class="has-text-centered is-size-7">
-              Average common-sense correlation still underestimates low-level physics gaps.
+              Overall accuracy correlates with the eight-benchmark average, but category-level breakdowns reveal physics-specific gaps.
             </p>
           </div>
           <div class="column">
@@ -741,10 +744,70 @@
                    alt="Correlation per external benchmark.">
             </figure>
             <p class="has-text-centered is-size-7">
-              Per-benchmark correlations stay weak for low-level physics reasoning.
+              Per-benchmark correlations remain weak for low-level physics reasoning.
             </p>
           </div>
         </div>
+        <h4 class="title is-5">Category-Level Correlations</h4>
+        <div class="columns is-mobile is-multiline">
+          <div class="column is-one-third">
+            <figure class="image">
+              <img src="./static/images/newtphys/cs_material_understanding.png"
+                   alt="Common-sense correlation for material understanding.">
+            </figure>
+            <p class="has-text-centered is-size-7">
+              Material understanding
+            </p>
+          </div>
+          <div class="column is-one-third">
+            <figure class="image">
+              <img src="./static/images/newtphys/cs_mechanics.png"
+                   alt="Common-sense correlation for mechanics.">
+            </figure>
+            <p class="has-text-centered is-size-7">
+              Mechanics
+            </p>
+          </div>
+          <div class="column is-one-third">
+            <figure class="image">
+              <img src="./static/images/newtphys/cs_spatial_reasoning.png"
+                   alt="Common-sense correlation for spatial reasoning.">
+            </figure>
+            <p class="has-text-centered is-size-7">
+              Spatial reasoning
+            </p>
+          </div>
+          <div class="column is-one-third">
+            <figure class="image">
+              <img src="./static/images/newtphys/cs_view_point.png"
+                   alt="Common-sense correlation for viewpoint reasoning.">
+            </figure>
+            <p class="has-text-centered is-size-7">
+              Viewpoint
+            </p>
+          </div>
+          <div class="column is-one-third">
+            <figure class="image">
+              <img src="./static/images/newtphys/cs_temporal.png"
+                   alt="Common-sense correlation for temporal reasoning.">
+            </figure>
+            <p class="has-text-centered is-size-7">
+              Temporal reasoning
+            </p>
+          </div>
+          <div class="column is-one-third">
+            <figure class="image">
+              <img src="./static/images/newtphys/cs_persistence.png"
+                   alt="Common-sense correlation for permanence reasoning.">
+            </figure>
+            <p class="has-text-centered is-size-7">
+              Permanence
+            </p>
+          </div>
+        </div>
+        <p class="has-text-centered">
+          The category plots show why aggregate correlations are insufficient: common-sense scores track spatial and viewpoint questions more closely than they track mechanics and material-property reasoning.
+        </p>
 
         <h3 class="title is-4">VFM Physics Probing</h3>
         <div class="content has-text-justified">
